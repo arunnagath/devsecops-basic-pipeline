@@ -1,1 +1,44 @@
-hello
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # - name: Install Python dependencies
+      #   run: |
+      #     python3 -m venv venv
+      #     source venv/bin/activate
+      #     # pip install -r requirements.txt
+
+      - name: Write Python Hello World program
+        run: |
+          echo "print('Hello, World!')" > hello_world.py
+
+      - name: Build Docker image
+        run: |
+          docker build -t arunnagath/hello_world:latest .
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+     
+      # - name: Login to GitHub Container Registry
+      #   run: |
+      #    docker login --username arunnagath --password-stdin
+      #    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
+      
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/arunnagath/helloworld:latest
+
+env:
+  CR_PAT: ${{ secrets.CR_PAT }}
